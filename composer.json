@@ -1,0 +1,24 @@
+{
+    "name": "wbarcovsky/yii2-request-docs",
+    "type": "yii2-extension",
+    "description": "Simple documentation generator for Yii2 REST applications based on defined API endpoints and actions annotations.",
+    "keywords": ["yii2", "rest", "api", "generator", "documentation"],
+    "license": "MIT",
+    "require": {
+        "yiisoft/yii2": "2.0.*"
+    },
+    "provide": {
+        "bower-asset/jquery": "*",
+        "bower-asset/jquery.inputmask": "*",
+        "bower-asset/punycode": "*",
+        "bower-asset/yii2-pjax": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "wbarcovsky\\yii2\\request_docs\\": ""
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.4"
+    }
+}

@@ -1,4 +1,4 @@
-tests\data
+tests/data
 .idea
 vendor
 composer.lock

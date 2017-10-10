@@ -3,7 +3,7 @@
 namespace wbarcovsky\yii2\request_docs\models;
 
 use wbarcovsky\yii2\request_docs\helpers\StructureHelper;
-use yii\base\Object;
+use yii\base\Model;
 
 /**
  * Class DocRequest
@@ -12,13 +12,15 @@ use yii\base\Object;
  * @property array $params
  * @property array $result
  */
-class DocRequest extends Object
+class DocRequest extends Model
 {
     protected static $allowedMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
 
     public $hash;
 
-    public $description = null;
+    public $title = '';
+
+    public $description;
 
     protected $_method;
 
@@ -27,6 +29,24 @@ class DocRequest extends Object
     protected $_result = [];
 
     protected $_url;
+
+    public function fields()
+    {
+        return [
+            'hash',
+            'title',
+            'description',
+            'method',
+            'url',
+            'params',
+            'result',
+        ];
+    }
+
+    public function attributes()
+    {
+        return $this->fields();
+    }
 
     public function getUrl()
     {
@@ -59,29 +79,47 @@ class DocRequest extends Object
         return preg_replace('/\/(\d+)$/', '/:id', trim(trim($url), '/'));
     }
 
-    public function getDataHash()
-    {
-        return substr(StructureHelper::getStructureHash($this->params), 0, 5) .
-            substr(StructureHelper::getStructureHash($this->result), 0, 5);
-    }
-
     public function getParams()
     {
         return $this->_params;
     }
 
+    public function setParams($params)
+    {
+        $this->_params = $params;
+    }
     public function addParams($params)
     {
-        $this->_params[] = $params;
+        if (!empty($params)) {
+            $this->_params[] = $params;
+        }
     }
+
 
     public function getResult()
     {
         return $this->_result;
     }
 
+    public function setResult($result)
+    {
+        $this->_result = $result;
+    }
     public function addResult($result)
     {
-        $this->_result[] = $result;
+        if (!empty($result)) {
+            $this->_result[] = $result;
+        }
+    }
+
+    public function getMethodHash()
+    {
+        return substr(md5($this->url . $this->method . $this->title), 0, 6);
+    }
+
+    public function getDataHash()
+    {
+        return substr(StructureHelper::getStructureHash($this->params), 0, 5) .
+            substr(StructureHelper::getStructureHash($this->result), 0, 5);
     }
 }

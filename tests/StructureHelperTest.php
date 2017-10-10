@@ -5,7 +5,7 @@ namespace wbarcovsky\yii2\request_docs\tests;
 use PHPUnit\Framework\TestCase;
 use wbarcovsky\yii2\request_docs\helpers\StructureHelper;
 
-class TestStructureHelper extends TestCase
+class StructureHelperTest extends TestCase
 {
     public function testArray()
     {

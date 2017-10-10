@@ -18,23 +18,37 @@ class RequestDocs extends Component
      */
     protected $requests = null;
 
+    public function init()
+    {
+        parent::init();
+        $this->loadRequests();
+    }
+
     /**
      * @param string $method
      * @param string $url
+     * @param string $title
      * @param array $params
      * @param array $result
      * @return DocRequest
      */
-    public function addRequest($method, $url, $params = [], $result = [])
+    public function addRequest($method, $url, $title = '', $params = [], $result = [])
     {
         $request = new DocRequest([
             'url' => $url,
             'method' => $method,
+            'title' => $title,
         ]);
-        $request->addResult($result);
-        $request->addParams($params);
-        $this->requests[] = $request;
-        return $this->$request;
+        $hash = $request->getMethodHash();
+        if (isset($this->requests[$hash])) {
+            $this->requests[$hash]->addParams($params);
+            $this->requests[$hash]->addResult($result);
+        } else {
+            $request->addResult($result);
+            $request->addParams($params);
+            $this->requests[$hash] = $request;
+        }
+        return $this->requests[$hash];
     }
 
     public function storeRequests()
@@ -58,6 +72,7 @@ class RequestDocs extends Component
             $shortInfo = [
                 'method' => $request->method,
                 'url' => $request->url,
+                'title' => $request->title,
                 'params' => StructureHelper::getStructure($mergeParams),
                 'result' => StructureHelper::getStructure($mergeResult),
             ];
@@ -70,7 +85,10 @@ class RequestDocs extends Component
             $request->hash = $request->getDataHash();
             $fillInfoPath = $this->getFullInfoPath($request);
             $this->createDir(dirname($fillInfoPath));
-            //file_put_contents("zip://{$fillInfoPath}#info.json", json_encode($request));
+            $zip = new \ZipArchive();
+            $zip->open($fillInfoPath, \ZipArchive::CREATE);
+            $zip->addFromString('data.json', json_encode($request->toArray()));
+            $zip->close();
         }
     }
 
@@ -80,16 +98,22 @@ class RequestDocs extends Component
      */
     protected function getShortInfoPath($request)
     {
-        return \Yii::getAlias($this->storeFolder) . '/' . $request->method . '__' . $this->getUrlPath($request->url) . '.json';
+        return \Yii::getAlias($this->storeFolder) . "/{$request->method}__{$this->getUrlPath($request->url)}.{$request->getMethodHash()}.json";
     }
 
     /**
      * @param DocRequest $request
      * @return string
+     * @internal param bool $zip
      */
     protected function getFullInfoPath($request)
     {
-        return \Yii::getAlias($this->storeFolder) . '/zip/' . $request->method . '__' . $this->getUrlPath($request->url) . '.zip';
+        return "{$this->fullInfoFolder()}/{$request->method}__{$this->getUrlPath($request->url)}.{$request->getMethodHash()}.zip";
+    }
+
+    protected function fullInfoFolder()
+    {
+        return \Yii::getAlias($this->storeFolder) . "/full_info";
     }
 
     protected function getUrlPath($url)
@@ -97,10 +121,25 @@ class RequestDocs extends Component
         return str_replace(':id', 'id', str_replace('/', '-', $url));
     }
 
-    protected function loadRequests()
+    public function loadRequests()
     {
-        // TODO!
         $this->requests = [];
+        $files = glob($this->fullInfoFolder() . '/*');
+        foreach ($files as $file) {
+            if (is_file($file) && $file) {
+                $request = new DocRequest();
+                $data = json_decode(file_get_contents("zip://{$file}#data.json"), true);
+                if (isset($data['url'])) {
+                    $request->setAttributes($data, false);
+                    $this->requests[] = $request;
+                }
+            }
+        }
+    }
+
+    public function getRequests()
+    {
+        return $this->requests;
     }
 
     protected function createDir($folder)

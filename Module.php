@@ -2,30 +2,31 @@
 namespace wbarcovsky\yii2\request_docs;
 
 use wbarcovsky\yii2\request_docs\components\RequestDocs;
-use yii\base\BootstrapInterface;
-use yii\web\Application;
 
-class Module extends \yii\base\Module implements BootstrapInterface
+class Module extends \yii\base\Module
 {
     public $controllerNamespace = 'wbarcovsky\yii2\request_docs\controllers';
 
-    public $docUrl = 'docs';
+    public $defaultRoute = 'docs';
 
     /**
-     * @var RequestDocs
+     * @var string
      */
     public $requestDocsComponent;
 
-    public function bootstrap($app)
+    public function init()
     {
-        if (empty($this->requestDocsService)) {
+        if (empty($this->requestDocsComponent)) {
             throw new \Exception("You must pass requestDocsComponent to request docs module");
         }
-        if ($app instanceof Application) {
-            $app->getUrlManager()->addRules([
-                $this->docUrl => $this->id . '/default/index',
-                $this->docUrl . '/<controller:[\w\-]+>/<action:[\w\-]+>' => $this->id . '/<controller>/<action>',
-            ], false);
-        }
+    }
+
+    /**
+     * @return RequestDocs
+     */
+    public function getRequestDocsComponent()
+    {
+        $component = $this->requestDocsComponent;
+        return \Yii::$app->$component;
     }
 }

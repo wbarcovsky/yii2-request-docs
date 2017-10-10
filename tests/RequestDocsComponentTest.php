@@ -5,7 +5,7 @@ namespace wbarcovsky\yii2\request_docs\tests;
 use PHPUnit\Framework\TestCase;
 use wbarcovsky\yii2\request_docs\components\RequestDocs;
 
-class TestRequestDocsComponent extends TestCase
+class RequestDocsComponentTest extends TestCase
 {
     public function setUp()
     {
@@ -19,8 +19,8 @@ class TestRequestDocsComponent extends TestCase
                 unlink($file);
             }
         }
-        if (is_dir($this->getDataPath() . '/zip/')) {
-            $files = glob($this->getDataPath() . '/zip/');
+        if (is_dir($this->getDataPath() . '/fill_info/')) {
+            $files = glob($this->getDataPath() . '/fill_info/');
             foreach ($files as $file) {
                 if (is_file($file) && $file) {
                     unlink($file);
@@ -52,7 +52,7 @@ class TestRequestDocsComponent extends TestCase
         $request2->addResult(['test' => 123]);
 
         $docs->storeRequests();
-        $file = $this->getDataPath() . '/GET__api-user-id.json';
+        $file = $this->getDataPath() . '/GET__api-user-id.4ace4c.json';
         $this->assertFileExists($file);
         $data = json_decode(file_get_contents($file), true);
         $this->assertEquals($data['method'], 'GET');
@@ -62,6 +62,24 @@ class TestRequestDocsComponent extends TestCase
         $this->assertEquals($data['params']['object.y'], 'double');
         $this->assertEquals($data['result']['success'], 'boolean');
         $this->assertEquals($data['result']['test'], 'integer');
+
+        // Check zip file
+        $zipFile = $this->getDataPath() . '/full_info/GET__api-user-id.4ace4c.zip';
+        $this->assertFileExists($zipFile);
+        $data = json_decode(file_get_contents("zip://{$zipFile}#data.json"), true);
+        $this->assertEquals($data['method'], 'GET');
+        $this->assertEquals($data['url'], 'api/user/:id');
+        $this->assertNotEmpty($data['result']);
+        $this->assertNotEmpty($data['params']);
+
+        // Check load requests
+        $docs2 = new RequestDocs(['storeFolder' => $this->getDataPath()]);
+        $this->assertNotEmpty($docs2->getRequests());
+        $request = $docs2->getRequests()[0];
+        $this->assertNotEmpty($request->hash);
+        $this->assertNotEmpty($request->url);
+        $this->assertNotEmpty($request->getParams());
+        $this->assertNotEmpty($request->getResult());
     }
 
     protected function getDataPath()

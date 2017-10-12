@@ -57,12 +57,4 @@ class DocsController extends Controller
         $request = Module::getInstance()->getRequestDocsComponent()->loadRequestByHash($hash);
         return json_encode($request->toArray());
     }
-
-    public function actionTest()
-    {
-        $request = Module::getInstance()->getRequestDocsComponent()->addRequest('DELETE', '/webportal/news/123', 'Удаление одной новости');
-        $request->addResult(['success' => true]);
-        Module::getInstance()->getRequestDocsComponent()->storeRequests();
-        echo 'OK!';
-    }
 }

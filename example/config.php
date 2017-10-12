@@ -21,6 +21,10 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
         ],
+        'assetsManager' => [
+            'class' => 'yii\web\AssetManager',
+            'forceCopy' => true,
+        ]
     ],
     'defaultRoute' => 'docs',
 ];

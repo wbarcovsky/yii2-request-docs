@@ -13,6 +13,8 @@ class RequestDocs extends Component
 
     public $excludeParams = [];
 
+    public $autoLoadRequests = true;
+
     /**
      * @var DocRequest[]
      */
@@ -21,7 +23,9 @@ class RequestDocs extends Component
     public function init()
     {
         parent::init();
-        $this->loadRequests();
+        if ($this->autoLoadRequests) {
+            $this->loadRequests();
+        }
     }
 
     /**
@@ -98,7 +102,7 @@ class RequestDocs extends Component
      */
     protected function getShortInfoPath($request)
     {
-        return \Yii::getAlias($this->storeFolder) . "/{$request->method}__{$this->getUrlPath($request->url)}.{$request->getMethodHash()}.json";
+        return "{$this->folder()}/{$request->method}__{$this->getUrlPath($request->url)}.{$request->getMethodHash()}.json";
     }
 
     /**
@@ -108,12 +112,12 @@ class RequestDocs extends Component
      */
     protected function getFullInfoPath($request)
     {
-        return "{$this->fullInfoFolder()}/{$request->method}__{$this->getUrlPath($request->url)}.{$request->getMethodHash()}.zip";
+        return "{$this->folder(true)}/{$request->method}__{$this->getUrlPath($request->url)}.{$request->getMethodHash()}.zip";
     }
 
-    protected function fullInfoFolder()
+    protected function folder($fullInfo = false)
     {
-        return \Yii::getAlias($this->storeFolder) . "/full_info";
+        return \Yii::getAlias($this->storeFolder) . ($fullInfo ? '/full_info' : '');
     }
 
     protected function getUrlPath($url)
@@ -124,7 +128,7 @@ class RequestDocs extends Component
     public function loadRequests()
     {
         $this->requests = [];
-        $files = glob($this->fullInfoFolder() . '/*');
+        $files = glob($this->folder(true) . '/*');
         foreach ($files as $file) {
             if (is_file($file) && $file) {
                 $request = new DocRequest();
@@ -135,6 +139,46 @@ class RequestDocs extends Component
                 }
             }
         }
+    }
+
+    /**
+     * @param $hash
+     * @return null|DocRequest
+     */
+    public function loadRequestByHash($hash)
+    {
+        $files = glob($this->folder(true) . '/*');
+        foreach ($files as $file) {
+            if (is_file($file) && $file) {
+                $array = explode('.', $file);
+                $hashFile = $array[count($array) - 2];
+                if ($hashFile === $hash) {
+                    $request = new DocRequest();
+                    $data = json_decode(file_get_contents("zip://{$file}#data.json"), true);
+                    $request->setAttributes($data, false);
+                    return $request;
+                }
+            }
+        }
+        return null;
+    }
+
+    public function loadShortInfo()
+    {
+        $result = [];
+        $files = glob($this->folder() . '/*');
+        foreach ($files as $file) {
+            if (is_file($file) && $file) {
+                $data = json_decode(file_get_contents($file), true);
+                $array = explode('.', $file);
+                $hash = $array[count($array) - 2];
+                if (isset($data['url']) && !empty($hash)) {
+                    $result[$hash] = $data;
+                    $result[$hash]['hash'] = $hash;
+                }
+            }
+        }
+        return $result;
     }
 
     public function getRequests()

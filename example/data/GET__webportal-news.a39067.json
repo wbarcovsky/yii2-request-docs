@@ -1,0 +1,15 @@
+{
+    "method": "GET",
+    "url": "webportal\/news",
+    "title": "\u0417\u0430\u043f\u0440\u043e\u0441 \u043d\u043e\u0432\u043e\u0441\u0442\u0435\u0439",
+    "params": {
+        "last": "integer"
+    },
+    "result": {
+        "id": "integer",
+        "ecopro_link": "string",
+        "article": "string",
+        "created_at": "string",
+        "title": "string"
+    }
+}

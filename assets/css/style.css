@@ -1,0 +1,57 @@
+.load {
+    text-align: center;
+    width: 100%;
+    opacity: 0.8;
+    margin-top: 1em;
+}
+
+.hide {
+    display: none;
+}
+
+.box {
+    padding: 0.65em;
+    margin-bottom: 0.5em !important;
+}
+
+.box-close .level {
+    margin-bottom: 0 !important;
+}
+
+.title {
+    margin-bottom: 0 !important;
+}
+
+.subtitle {
+    margin-bottom: 0 !important;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.toggle {
+    margin-top: 5px;
+    margin-bottom: auto;
+    font-size: 1.2em;
+}
+
+.box-open .fa-chevron-down {
+    display: none;
+}
+
+.box-close .fa-chevron-up {
+    display: none;
+}
+
+.box-close .data {
+    display: none;
+}
+
+.json-container .number {
+    border-radius: unset;
+    font-size: 12px;
+    padding: 0;
+    margin: 0;
+    height: auto;
+}

@@ -3,6 +3,7 @@
 /**
  * @var \yii\web\View $this
  * @var $requests array
+ * @var $open boolean
  */
 
 use wbarcovsky\yii2\request_docs\assets\DocsAsset;
@@ -39,7 +40,7 @@ DocsAsset::register($this);
 <body data-full-info-url="<?= Url::toRoute('full-info');?>">
 <div class="container">
   <br/>
-  <h1 class="title"><?= $title ?></h1>
+  <h1 class="title"><a href="<?= Url::base() . '?' ?>"><?= $title ?></a></h1>
   <hr/>
 
   <section class="section">
@@ -50,14 +51,14 @@ DocsAsset::register($this);
     </div>
     <br/>
       <?php foreach ($requests as $request): ?>
-        <div class="box box-close">
+        <div class="box <?= $open ? 'box-open' : 'box-close' ?>">
           <div class="level pointer" onclick="toggleBox(this.parentElement)">
             <h4 class="title is-spaced is-5">
               <span class="tag <?= getRequestClass($request) ?>"><?= $request['method'] ?></span>
               <a
                 href="<?= Url::base() . '?' . $request['method'] . '+' . $request['url'] ?>"><?= $request['url']; ?></a>
             </h4>
-            <h6 class="subtitle is-5"><?= $request['title']; ?></h6>
+            <h6 class="subtitle is-6"><?= $request['title']; ?></h6>
             <i class="toggle fa fa-chevron-down level-right"></i>
             <i class="toggle fa fa-chevron-up level-right"></i>
           </div>

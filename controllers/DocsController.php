@@ -9,7 +9,7 @@ class DocsController extends Controller
 {
     public function actionIndex()
     {
-        $data = [];
+        $data = ['open' => false];
         $data['search'] = \Yii::$app->request->getQueryParam('search');
         $data['requests'] = Module::getInstance()->getRequestDocsComponent()->loadShortInfo();
         usort($data['requests'], function ($a, $b) {
@@ -27,6 +27,7 @@ class DocsController extends Controller
                     }
                 }
             }
+            $data['open'] = true;
         }
         // Search requests by url or title
         if (!empty($data['search']) && empty($selectedRequest)) {

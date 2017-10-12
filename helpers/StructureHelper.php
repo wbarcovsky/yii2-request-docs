@@ -4,26 +4,39 @@ namespace wbarcovsky\yii2\request_docs\helpers;
 
 class StructureHelper
 {
-    public static function getStructure($data)
+    public static function getStructure($data, $key = null)
     {
         $result = [];
-        if (is_array($data) && isset($data[0]))  {
+        $workData = $data;
+        if (is_array($data) && isset($data[0]) && self::isObject($data[0])) {
             $workData = $data[0];
-        } else {
-            $workData = $data;
+        }
+        if (!is_array($workData)) {
+            throw new \Exception('HEY! ' . $key . json_encode($workData));
         }
         foreach ($workData as $key => $value) {
             if (is_string($value) || is_integer($value) || is_float($value) || is_bool($value)) {
                 $result[$key] = gettype($value);
-            }
-            if (is_array($value)) {
-                $structure = self::getStructure($value);
+            } elseif (self::isObject($value)) {
+                $structure = self::getStructure($value, "{$key}");
                 foreach ($structure as $field => $type) {
                     $result["{$key}.{$field}"] = $type;
                 }
+            } elseif (is_array($value) && isset($value[0]) && self::isObject($value[0])) {
+                $structure = self::getStructure($value[0], "{$key}");
+                foreach ($structure as $field => $type) {
+                    $result["{$key}.{$field}"] = $type;
+                }
+            } elseif (is_array($value) && isset($value[0]) && !self::isObject($value[0])) {
+                $result[$key] = 'array';
             }
         }
         return $result;
+    }
+
+    protected static function isObject($data)
+    {
+        return is_array($data) && !isset($data[0]);
     }
 
     public static function getStructureHash($data)

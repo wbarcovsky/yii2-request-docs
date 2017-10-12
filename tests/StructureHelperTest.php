@@ -77,4 +77,20 @@ class StructureHelperTest extends TestCase
         $this->assertNotEquals($hash1, $hash3);
         $this->assertNotEquals($hash1, $hash4);
     }
+
+    public function testFirstLevelArray()
+    {
+        $data = [
+            ['name' => 'Test Name', 'id' => 1, 'count' => 2],
+            ['name' => 'Test Name 2', 'id' => 5, 'count' => 3, 'newField' => 'new'],
+            ['name' => 'Test Name 3', 'id' => 7],
+        ];
+        $result = StructureHelper::getStructure($data);
+
+        $this->assertEquals($result, [
+            'name' => 'string',
+            'id' => 'integer',
+            'count' => 'integer',
+        ]);
+    }
 }

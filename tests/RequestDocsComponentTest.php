@@ -73,7 +73,10 @@ class RequestDocsComponentTest extends TestCase
         $this->assertNotEmpty($data['params']);
 
         // Check load requests
-        $docs2 = new RequestDocs(['storeFolder' => $this->getDataPath()]);
+        $docs2 = new RequestDocs([
+            'storeFolder' => $this->getDataPath(),
+            'autoLoadRequests' => true,
+        ]);
         $this->assertNotEmpty($docs2->getRequests());
         $request = $docs2->getRequests()[0];
         $this->assertNotEmpty($request->hash);

@@ -76,7 +76,7 @@ class DocRequest extends Model
 
     public static function normalizeUrl($url)
     {
-        return preg_replace('/\/(\d+)$/', '/:id', trim(trim($url), '/'));
+        return preg_replace('/(\d+)$/', ':id', trim(trim($url), '/'));
     }
 
     public function getParams()

@@ -13,7 +13,7 @@ class RequestDocs extends Component
 
     public $excludeParams = [];
 
-    public $autoLoadRequests = true;
+    public $autoLoadRequests = false;
 
     /**
      * @var DocRequest[]
@@ -62,10 +62,14 @@ class RequestDocs extends Component
             throw new \Exception("Path '{$path}' is not writeable'");
         }
         foreach ($this->requests as $request) {
+            $mergeParams = [];
             if (!empty($request->hash) && $request->getDataHash() === $request->hash) {
                 continue;
             }
-            $mergeParams = [];
+            $oldRequest = $this->loadRequestByHash($request->getMethodHash());
+            if ($oldRequest && $oldRequest->getDataHash() === $request->getDataHash()) {
+                continue;
+            }
             foreach ($request->getParams() as $param) {
                 $mergeParams = ArrayHelper::merge($mergeParams, $param);
             }

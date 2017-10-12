@@ -19,14 +19,13 @@ function loadParams(element, hash, result) {
   selectTab(element, tabClass);
   var content = element.closest('.data');
   var load = $(content).find('.load');
-  console.log(load.html());
   load.removeClass('hide');
 
   // Send request
   var url = $('body').data('full-info-url');
   $.get(url + '?hash=' + hash, function (data) {
     var json = JSON.parse(data);
-    $(content).find('.' + tabClass).jsonview(result ? json.result : json.params);
+    $(content).find('.' + tabClass).jsonview(result ? json.result[0] : json.params[0]);
     load.addClass('hide');
   });
 }

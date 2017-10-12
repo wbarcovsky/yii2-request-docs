@@ -27,9 +27,6 @@ function getRequestClass($request)
 
 DocsAsset::register($this);
 
-/*$this->registerJsFile('@docsModule/assets/js/jquery.js');
-$this->registerJsFile('@docsModule/assets/js/json-viewer.js');
-$this->registerJsFile('@docsModule/assets/js/scripts.js');*/
 ?>
 
 <html>

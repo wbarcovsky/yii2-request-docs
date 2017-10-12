@@ -7,12 +7,6 @@
     "require": {
         "yiisoft/yii2": "2.0.*"
     },
-    "provide": {
-        "bower-asset/jquery": "*",
-        "bower-asset/jquery.inputmask": "*",
-        "bower-asset/punycode": "*",
-        "bower-asset/yii2-pjax": "*"
-    },
     "autoload": {
         "psr-4": {
             "wbarcovsky\\yii2\\request_docs\\": ""

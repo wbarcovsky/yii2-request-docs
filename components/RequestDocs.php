@@ -18,7 +18,7 @@ class RequestDocs extends Component
     /**
      * @var DocRequest[]
      */
-    protected $requests = null;
+    protected $requests = [];
 
     public function init()
     {

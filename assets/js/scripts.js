@@ -25,7 +25,8 @@ function loadParams(element, hash, result) {
   var url = $('body').data('full-info-url');
   $.get(url + '?hash=' + hash, function (data) {
     var json = JSON.parse(data);
-    $(content).find('.' + tabClass).jsonview(result ? json.result[0] : json.params[0]);
+    var showData = result ? json.result : json.params;
+    $(content).find('.' + tabClass).jsonview(showData && showData.length > 0 ? showData[0] : showData);
     load.addClass('hide');
   });
 }

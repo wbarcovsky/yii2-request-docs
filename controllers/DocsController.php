@@ -49,7 +49,8 @@ class DocsController extends Controller
         }
         $data['title'] = Module::getInstance()->title;
         $this->layout = false;
-        return $this->render('/docs', $data);
+        $this->render('/docs', $data);
+        exit(0);
     }
 
     public function actionFullInfo()

@@ -9,6 +9,7 @@ class DocsController extends Controller
 {
     public function actionIndex()
     {
+        \Yii::$app->response->format = 'html';
         $data = ['open' => false];
         $data['search'] = \Yii::$app->request->getQueryParam('search');
         $data['requests'] = Module::getInstance()->getRequestDocsComponent()->loadShortInfo();
@@ -49,8 +50,8 @@ class DocsController extends Controller
         }
         $data['title'] = Module::getInstance()->title;
         $this->layout = false;
-        $this->render('/docs', $data);
-        exit(0);
+        print $this->render('/docs', $data);
+        exit();
     }
 
     public function actionFullInfo()

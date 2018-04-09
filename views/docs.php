@@ -65,11 +65,11 @@ DocsAsset::register($this);
           <div class="data">
             <div class="tabs">
               <ul>
-                <li class="is-active"><a href="javascript:void(0)" onclick="selectTab(this, 'params')">Request Data</a>
-                </li>
+                <li class="is-active"><a href="javascript:void(0)" onclick="selectTab(this, 'params')">Request Data</a></li>
                 <li><a href="javascript:void(0)" onclick="selectTab(this, 'result')">Response</a></li>
-                <li><a href="javascript:void(0)" onclick="loadParams(this, '<?= $request['hash'] ?>')">Request Examples</a></li>
-                <li><a href="javascript:void(0)" onclick="loadParams(this, '<?= $request['hash'] ?>', true)">Response Examples</a></li>
+                <li><a href="javascript:void(0)" onclick="loadParams(this, '<?= $request['hash'] ?>', 'params-example')">Request Examples</a></li>
+                <li><a href="javascript:void(0)" onclick="loadParams(this, '<?= $request['hash'] ?>', 'result-example')">Response Examples</a></li>
+                <li><a href="javascript:void(0)" onclick="loadParams(this, '<?= $request['hash'] ?>', 'description')">Description</a></li>
               </ul>
             </div>
             <table class="table is-fullwidth tab-content params">
@@ -94,6 +94,7 @@ DocsAsset::register($this);
             </table>
             <div class="tab-content hide params-example"></div>
             <div class="tab-content hide result-example"></div>
+            <div class="tab-content hide description"></div>
             <div class="load hide">
               <i class="fa fa-spinner fa-pulse fa-2x"></i>
             </div>

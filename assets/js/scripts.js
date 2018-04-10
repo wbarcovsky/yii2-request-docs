@@ -36,7 +36,7 @@ function loadParams(element, hash, tabClass) {
           showData = json.description;
           break;
     }
-    if (Array.isArray(showData)) {
+    if (Array.isArray(showData) && showData.length > 0) {
         $(content).find('.' + tabClass).jsonview(showData[0]);
     } else {
         $(content).find('.' + tabClass).html(showData);

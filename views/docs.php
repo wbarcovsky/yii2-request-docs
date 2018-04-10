@@ -94,7 +94,7 @@ DocsAsset::register($this);
             </table>
             <div class="tab-content hide params-example"></div>
             <div class="tab-content hide result-example"></div>
-            <div class="tab-content hide description"></div>
+            <div class="content tab-content hide description"></div>
             <div class="load hide">
               <i class="fa fa-spinner fa-pulse fa-2x"></i>
             </div>

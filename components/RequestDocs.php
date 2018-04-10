@@ -2,10 +2,14 @@
 
 namespace wbarcovsky\yii2\request_docs\components;
 
+use wbarcovsky\yii2\request_docs\Module;
+use Yii;
+use wbarcovsky\yii2\request_docs\commands\UrlResolverController;
 use wbarcovsky\yii2\request_docs\helpers\StructureHelper;
 use wbarcovsky\yii2\request_docs\models\DocRequest;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
+use phpDocumentor\Reflection\DocBlockFactory;
 
 class RequestDocs extends Component
 {
@@ -14,6 +18,10 @@ class RequestDocs extends Component
     public $excludeParams = [];
 
     public $autoLoadRequests = false;
+    /** @var UrlResolverController */
+    protected $command;
+    /** @var Module */
+    protected $module;
 
     /**
      * @var DocRequest[]
@@ -26,6 +34,69 @@ class RequestDocs extends Component
         if ($this->autoLoadRequests) {
             $this->loadRequests();
         }
+        $this->module = $this->getRequestDocsModule();
+        $this->command = new UrlResolverController(UrlResolverController::class, $this->module);
+    }
+
+
+    /**
+     * @return Module
+     * @throws \Exception
+     */
+    public function getRequestDocsModule()
+    {
+        $id = '';
+        foreach (Yii::$app->modules as $moduleId => $config) {
+            if (is_array($config)) {
+                if (isset($config['class'])
+                    && $config['class'] == Module::class
+                ) {
+                    $id = $moduleId;
+                    break;
+                }
+            } elseif (is_object($config)) {
+                if (Module::class == get_class($config)) {
+                    $id = $moduleId;
+                    break;
+                }
+            }
+        }
+        if (empty($id)) {
+            throw new \Exception('Модуль ' . Module::class . ' не найден (пропишите его в секцию modules основного конфига');
+        }
+        $module = Yii::$app->getModule($id);
+        if (empty($module)) {
+            throw new \Exception('Модуль ' . Module::class . ' не загружен');
+        }
+        return $module;
+    }
+
+    /**
+     * Из $url найдет контроллер, действие и вытащит из DocBlock метода краткое и подробное описание.
+     * @param string $url
+     * @param string $httpMethod
+     * @return array
+     * @throws \ReflectionException
+     */
+    protected function getUrlInto($url, $httpMethod)
+    {
+        $result = [
+            'summary' => '', // краткое описание
+            'description' => '', // подробное описание
+        ];
+        list ($controllerClassName, $actionMethodName) = $this->command->runAction('route', [
+            $this->module->getUniqueId(), // moduleId
+            $url,
+            $httpMethod,
+        ]);
+
+        $reflection = new \ReflectionMethod($controllerClassName, $actionMethodName);
+        $docComment = $reflection->getDocComment();
+        $factory = DocBlockFactory::createInstance();
+        $docBlock = $factory->create($docComment);
+        $result['description'] = $docBlock->getDescription()->render();
+        $result['summary'] = $docBlock->getSummary();
+        return $result;
     }
 
     /**
@@ -38,10 +109,12 @@ class RequestDocs extends Component
      */
     public function addRequest($method, $url, $title = '', $params = [], $result = [])
     {
+        $urlInfo = $this->getUrlInto($url, $method);
         $request = new DocRequest([
             'url' => $url,
             'method' => $method,
-            'title' => $title,
+            'title' => empty($title) ? $urlInfo['summary'] : $title,
+            'description' => $urlInfo['description'],
         ]);
         $hash = $request->getMethodHash();
         if (isset($this->requests[$hash])) {
@@ -57,7 +130,7 @@ class RequestDocs extends Component
 
     public function storeRequests()
     {
-        $path = \Yii::getAlias($this->storeFolder);
+        $path = Yii::getAlias($this->storeFolder);
         if (!is_writeable($path)) {
             throw new \Exception("Path '{$path}' is not writeable'");
         }
@@ -121,7 +194,7 @@ class RequestDocs extends Component
 
     protected function folder($fullInfo = false)
     {
-        return \Yii::getAlias($this->storeFolder) . ($fullInfo ? '/full_info' : '');
+        return Yii::getAlias($this->storeFolder) . ($fullInfo ? '/full_info' : '');
     }
 
     protected function getUrlPath($url)

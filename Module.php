@@ -1,6 +1,7 @@
 <?php
 namespace wbarcovsky\yii2\request_docs;
 
+use wbarcovsky\yii2\request_docs\commands\UrlResolverController;
 use wbarcovsky\yii2\request_docs\components\RequestDocs;
 
 class Module extends \yii\base\Module
@@ -20,6 +21,9 @@ class Module extends \yii\base\Module
     {
         if (empty($this->requestDocsComponent)) {
             throw new \Exception("You must pass requestDocsComponent to request docs module");
+        }
+        if (\Yii::$app instanceof \yii\console\Application) {
+            $this->controllerNamespace = 'wbarcovsky\yii2\request_docs\commands';
         }
     }
 

@@ -14,8 +14,7 @@ function selectTab(element, showTableClass) {
   $(content).find('.' + showTableClass).removeClass('hide');
 }
 
-function loadParams(element, hash, result) {
-  var tabClass = result ? 'result-example' : 'params-example';
+function loadParams(element, hash, tabClass) {
   selectTab(element, tabClass);
   var content = element.closest('.data');
   var load = $(content).find('.load');
@@ -25,8 +24,23 @@ function loadParams(element, hash, result) {
   var url = $('body').data('full-info-url');
   $.get(url + '?hash=' + hash, function (data) {
     var json = JSON.parse(data);
-    var showData = result ? json.result : json.params;
-    $(content).find('.' + tabClass).jsonview(showData && showData.length > 0 ? showData[0] : showData);
+    var showData = '';
+    switch (tabClass) {
+      case 'result-example':
+        showData = json.result;
+          break;
+        case 'params-example':
+          showData = json.params;
+          break;
+        case 'description':
+          showData = json.description;
+          break;
+    }
+    if (Array.isArray(showData)) {
+        $(content).find('.' + tabClass).jsonview(showData[0]);
+    } else {
+        $(content).find('.' + tabClass).html(showData);
+    }
     load.addClass('hide');
   });
 }

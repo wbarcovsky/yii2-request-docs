@@ -39,7 +39,7 @@ function loadParams(element, hash, tabClass) {
     if (Array.isArray(showData)) {
         $(content).find('.' + tabClass).jsonview(showData[0]);
     } else {
-        $(content).find('.' + tabClass).text(showData);
+        $(content).find('.' + tabClass).html(showData);
     }
     load.addClass('hide');
   });

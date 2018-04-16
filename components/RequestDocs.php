@@ -92,10 +92,12 @@ class RequestDocs extends Component
 
         $reflection = new \ReflectionMethod($controllerClassName, $actionMethodName);
         $docComment = $reflection->getDocComment();
-        $factory = DocBlockFactory::createInstance();
-        $docBlock = $factory->create($docComment);
-        $result['description'] = $docBlock->getDescription()->render();
-        $result['summary'] = $docBlock->getSummary();
+        if ($docComment) {
+            $factory = DocBlockFactory::createInstance();
+            $docBlock = $factory->create($docComment);
+            $result['description'] = $docBlock->getDescription()->render();
+            $result['summary'] = $docBlock->getSummary();
+        }
         return $result;
     }
 

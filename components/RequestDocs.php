@@ -2,6 +2,9 @@
 
 namespace wbarcovsky\yii2\request_docs\components;
 
+use wbarcovsky\yii2\request_docs\models\apiDocJs\Tags\Api;
+use wbarcovsky\yii2\request_docs\models\apiDocJs\Tags\ApiDefine;
+use wbarcovsky\yii2\request_docs\models\apiDocJs\Tags\ApiDescription;
 use wbarcovsky\yii2\request_docs\Module;
 use Yii;
 use wbarcovsky\yii2\request_docs\commands\UrlResolverController;
@@ -89,14 +92,76 @@ class RequestDocs extends Component
             $url,
             $httpMethod,
         ]);
+        $httpMethodUpper = mb_convert_case($httpMethod, MB_CASE_UPPER);
 
         $reflection = new \ReflectionMethod($controllerClassName, $actionMethodName);
         $docComment = $reflection->getDocComment();
         if ($docComment) {
-            $factory = DocBlockFactory::createInstance();
-            $docBlock = $factory->create($docComment);
-            $result['description'] = $docBlock->getDescription()->render();
-            $result['summary'] = $docBlock->getSummary();
+            $docCommentList = self::getAllDocComment($controllerClassName, $actionMethodName);
+            $factory = DocBlockFactory::createInstance([
+                'api' => Api::class,
+                'apiDefine' => ApiDefine::class,
+                'apiDescription' => ApiDescription::class,
+            ]);
+            foreach ($docCommentList as $docComment) {
+                $docBlock = $factory->create($docComment);
+                /** @var BaseTag $tag */
+                $apiTagList = $docBlock->getTagsByName('api');
+                /** @var Api $apiTag */
+                foreach ($apiTagList as $apiTag) {
+                    if ($apiTag->getMethod() == $httpMethodUpper) {
+                        $result['summary'] = $apiTag->getTitle();
+                        $apiDescriptionTagList = $docBlock->getTagsByName('apiDescription');
+                        if (isset($apiDescriptionTagList[0])) {
+                            $result['description'] = $apiDescriptionTagList[0]->getText()->render();
+                        }
+                    }
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Вытаскивает все DocBlock комментарии для заданного метода $methodName, а не только самый первый (как это делает
+     * \ReflectionMethod::getDocComment().
+     * @param string $className Имя класса
+     * @param string $methodName Имя метода
+     * @return array
+     * @throws \ReflectionException
+     */
+    private static function getAllDocComment($className, $methodName)
+    {
+        $result = [];
+        $class = new \ReflectionClass($className);
+        $tokenList = token_get_all(file_get_contents($class->getFileName()));
+        // Ключи элементов в которых встречается $methodName
+        $methodNameIndexList = array_keys(array_filter($tokenList, function ($value) use ($methodName) {
+            return isset($value[1]) && $value[1] == $methodName;
+        }));
+        foreach ($methodNameIndexList as $index) {
+            $functionIndex = $index - 2;
+            // В массиве токенов находим определение функции
+            if (isset($tokenList[$functionIndex])
+                && $tokenList[$functionIndex][0] === T_FUNCTION
+            ) {
+                for ($i = $functionIndex; $i > 0; $i--) {
+                    $token = $tokenList[$i];
+                    if (is_string($token)) {
+                        // Если это...
+                        if ($token == '}'    // ...предыдущий метод
+                            || $token == '{' // ...начало описание класса
+                            || $token == ';' // ...переменная, константа
+                        ) {
+                            break 2; // все DocBlock методы получены
+                        }
+                    } else {
+                        if ($token[0] === T_DOC_COMMENT) {
+                            $result[] = $token[1];
+                        }
+                    }
+                }
+            }
         }
         return $result;
     }

@@ -4,6 +4,7 @@ namespace wbarcovsky\yii2\request_docs\helpers;
 
 use Yii;
 use Exception;
+use yii\helpers\BaseInflector;
 
 /**
  * Вычисление вызываемых частей системы на основании URL
@@ -46,7 +47,7 @@ class UrlResolver
         if (empty($actionName)) {
             $actionName = $controller->defaultAction;
         }
-        $actionMethodName = 'action' . ucfirst($actionName);
+        $actionMethodName = 'action' . BaseInflector::id2camel($actionName);
         if (!$controller->hasMethod($actionMethodName)) {
             throw new Exception('В классе контроллера ' . get_class($controller) . ' отсутствует действие ' . $actionMethodName);
         }

@@ -1,4 +1,5 @@
 var converter = new showdown.Converter();
+converter.setFlavor('github');
 
 function toggleBox(box) {
   box.classList.toggle('box-close');

@@ -17,6 +17,7 @@ class DocsAsset extends AssetBundle
     public $js = [
         'js/jquery.js',
         'js/json-viewer.js',
+        'js/showdown_1.8.6.min.js',
         'js/scripts.js',
     ];
 

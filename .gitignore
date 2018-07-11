@@ -1,0 +1,5 @@
+tests/data
+.idea
+vendor
+composer.lock
+example/assets

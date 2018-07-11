@@ -1,0 +1,14 @@
+{
+    "method": "GET",
+    "url": "api\/user\/:id",
+    "title": "",
+    "params": {
+        "state": "string",
+        "object.x": "double",
+        "object.y": "double"
+    },
+    "result": {
+        "success": "boolean",
+        "test": "integer"
+    }
+}

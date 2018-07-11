@@ -1,3 +1,4 @@
+var converter = new showdown.Converter();
 
 function toggleBox(box) {
   box.classList.toggle('box-close');
@@ -34,7 +35,7 @@ function loadParams(element, hash, tabClass) {
           showData = json.params;
           break;
         case 'description':
-          showData = json.description;
+          showData = converter.makeHtml(json.description);
           break;
     }
     if (Array.isArray(showData) && showData.length > 0) {
